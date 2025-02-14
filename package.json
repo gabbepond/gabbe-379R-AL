@@ -40,8 +40,12 @@
 	},
 	"dependencies": {
 		"@types/dompurify": "^3.0.5",
+		"@types/marked": "^5.0.2",
 		"dompurify": "^3.2.4",
 		"lucide-svelte": "^0.475.0",
-		"openai": "^4.85.0"
+		"marked": "^15.0.7",
+		"marked-highlight": "^2.2.1",
+		"openai": "^4.85.0",
+		"weaviate-client": "^3.3.6"
 	}
 }
