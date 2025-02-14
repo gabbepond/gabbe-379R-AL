@@ -179,7 +179,7 @@
 					<hr />
 					<div class="flex space-x-4">
 						<textarea
-							class="textarea"
+							class="textarea p-5"
 							required
 							placeholder="Type your message..."
 							name="message"
