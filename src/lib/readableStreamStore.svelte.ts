@@ -33,11 +33,7 @@ export function readableStreamStore() {
             return finaltext;
         } catch (err: unknown) {
             loading = false;
-            if (err instanceof Error) {
-                text = err.toString();
-            } else {
-                text = String(err);
-            }
+            text = err.toString();
             throw err;
         }
     }

@@ -90,7 +90,7 @@ export const POST = async ({ request }) => {
 				'Content-Type': 'application/json'
 			}
 		});
-	} catch {
+	} catch (error) {
 		return new Response('Something went wrong', { status: 500 });
 	}
 };
