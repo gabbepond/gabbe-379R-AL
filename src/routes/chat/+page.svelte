@@ -1,95 +1,289 @@
 <script lang="ts">
-    //let { selectedSystemPrompt = $bindable() } = $props()
-    
-let systemPrompts = [
-        'Helpful Assistant',
-        'Emoji Pirate',
-        'Web Development Instructor',
-        'Physics Tutor',
-    ];
+	import { Avatar } from '@skeletonlabs/skeleton-svelte';
+	import TypingIndicator from '$lib/utils/typingIndicator.svelte';
+	import { readableStreamStore } from '$lib/readableStreamStore.svelte';
+	import { Marked } from 'marked';
+	import { markedHighlight } from 'marked-highlight';
+	import DOMPurify from 'dompurify';
+	import ChatAppBar from '$lib/components/ChatAppBar.svelte';
+	import FileUploadAside from '$lib/components/FileUploadAside.svelte';
+	import { CircleX } from 'lucide-svelte'
+	
 
-    let examplePrompts = [
-        'Tell me a joke',
-        'Explain quantum computing',
-        'Write a haiku about programming',
-        'Describe the benefits of exercise',
-    ];
+	import hljs from 'highlight.js';
+	import javascript from 'highlight.js/lib/languages/javascript';
+	import typescript from 'highlight.js/lib/languages/typescript';
+	import css from 'highlight.js/lib/languages/css';
+	hljs.registerLanguage('javascript', javascript);
+	hljs.registerLanguage('typescript', typescript);
+	hljs.registerLanguage('css', css)
 
-    let { 
-        selectedSystemPrompt = $bindable(systemPrompts[0]),
-        selectedExamplePrompt = $bindable(''),
-        deepSeek = $bindable(false) 
-    } = $props<{
-        selectedSystemPrompt?: string;
-        selectedExamplePrompt?: string;
-        deepSeek?: boolean;
-    }>();
+	const marked = new Marked(
+		markedHighlight({
+			langPrefix: 'hljs language-',
+			highlight: (code, lang) => {
+				const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+				return hljs.highlight(code, { language }).value;
+			}
+		})
+	)
+	interface PageData {
+		fileNames?: string[];
+	}
 
-/* 
-    function handleSystemPromptChange(event: Event & { currentTarget: EventTarget & HTMLSelectElement }) {
-        selectedSystemPrompt = (event.currentTarget as HTMLSelectElement).value;
-    }
+	let { data } = $props<{ data: PageData }>()
 
-    function handleExamplePromptChange(event: Event & { currentTarget: EventTarget & HTMLSelectElement }) {
-        selectedExamplePrompt = event.currentTarget.value;
-    } */
-  </script>
-  
-  <nav class="bg-primary-800 w-full p-4">
-    <div class="container mx-auto flex items-center justify-between">
-      <div class="text-white font-bold text-xl">AI Chat Experiments</div>
-      
-      <div class="flex items-center space-x-4">
-        <!-- System Prompt Dropdown -->
-        <div class="relative">
-          <select
-            class="bg-secondary-900 text-white py-2 px-4 rounded-md"
-            bind:value={selectedSystemPrompt}
-          >
-            {#each systemPrompts as prompt}
-              <option value={prompt}>{prompt}</option>
-            {/each}
-          </select>
-        </div>
-  
-        <!-- Example Prompts Dropdown -->
-        <div class="relative">
-          <select
-            class="bg-secondary-900 text-white py-2 px-4 rounded-md"
-            bind:value={selectedExamplePrompt}
-          >
-            <option value="">Select an example prompt</option>
-            {#each examplePrompts as prompt}
-              <option value={prompt}>{prompt}</option>
-            {/each}
-          </select>
-        </div>
-  
-        <!-- JSON Mode Toggle -->
-        <div class="flex items-center">
-          <span class="text-white mr-2">Use DeepSeek?</span>
-          <!-- svelte-ignore a11y_consider_explicit_label -->
-          <button
-            class={`w-12 h-6 rounded-full p-1 ${
-              deepSeek ? 'bg-green-400' : 'bg-gray-400'
-            }`}
-            onclick={() => deepSeek = !deepSeek}
-          >
-            <div
-              class={`w-4 h-4 rounded-full bg-white transform transition-transform ${
-                deepSeek ? 'translate-x-6' : ''
-              }`}
-            ></div>
-          </button>
-        </div>
-      </div>
-    </div>
-  </nav>
-  
-{#if selectedSystemPrompt}
-    <div class="bg-yellow-100 p-4 mt-4">
-      <p class="text-yellow-800">System Prompt: {selectedSystemPrompt}</p>
-    </div>
-  {/if}
-  
-  <!-- gabbe -->
+	let systemPrompt = $state('');
+	let examplePrompt = $state('');
+	let deepSeek = $state(false);
+	let fileNames = $state([] as string[])
+
+	let chatHistory = $state(
+		typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('chatHistory') || '[]') : []
+	);
+	$effect(() => {
+		if (data?.fileNames) {
+			fileNames = [...data.fileNames]
+		}
+	})
+
+	$effect(() => {
+		if (typeof window !== 'undefined') {
+			localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+		}
+	});
+
+	const response = readableStreamStore();
+
+	let responseText = $state('');
+
+	// Add this helper function
+	function stripThinkTags(text: string): string {
+		const thinkRegex = /<think>[\s\S]*?<\/think>/g;
+		return text.replace(thinkRegex, '');
+	}
+
+	$effect(() => {
+		if (response.text !== '') {
+			(async () => {
+				// Strip <think> tags from the response text
+				//const cleanedText = stripThinkTags(response.text);
+				const parsedText = await marked.parse(response.text);
+				responseText = DOMPurify.sanitize(parsedText)
+					.replace(/<script>/g, '&lt;script&gt;')
+					.replace(/<\/script>/g, '&lt;/script&gt;');
+			})();
+		}
+	});
+
+	async function handleSubmit(this: HTMLFormElement, event: Event) {
+		event?.preventDefault();
+		if (response.loading) return; // prevent request while waiting for response
+
+		const formData: FormData = new FormData(this);
+		const message = formData.get('message');
+
+		if (!message) {
+			return;
+		}
+
+		chatHistory = [...chatHistory, { role: 'user', content: message as string }];
+
+		try {
+			const answer = response.request(
+				new Request('/api/chat', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						chats: chatHistory,
+						systemPrompt,
+						deepSeek,
+						fileNames
+					})
+				})
+			);
+
+			this.reset(); // clear the form
+
+			const answerText = (await answer) as string;
+
+			const parsedAnswer = await marked.parse(answerText);
+			//const cleanedAnswer = stripThinkTags(parsedAnswer);
+			const purifiedText = DOMPurify.sanitize(parsedAnswer)
+				.replace(/<script>/g, '&lt;script&gt;')
+				.replace(/<\/script>/g, '&lt;/script&gt;');
+
+			// put the answer into the chat history with role 'assistant'
+
+			chatHistory = [...chatHistory, { role: 'assistant', content: purifiedText }];
+
+			console.log(answerText);
+		} catch (error) {
+			console.error(error);
+		}
+	}
+	
+
+	function deleteAllChats() {
+		chatHistory = [];
+	}
+
+	function deleteFileName(fileName: string) {
+		// Update the local state instead of the prop
+		fileNames = fileNames.filter((name) => name !== fileName)
+	}
+</script>
+
+<main class="flex min-h-screen w-screen flex-col items-center bg-pink-100">
+	<!-- The app bar for this page -->
+	<ChatAppBar
+		bind:selectedSystemPrompt={systemPrompt}
+		bind:selectedExamplePrompt={examplePrompt}
+		bind:deepSeek
+	/>
+
+	<div class="flex w-full">
+		<FileUploadAside />
+		<form
+			onsubmit={handleSubmit}
+			class="m-4 flex flex-col rounded-xxl border-2 border-black p-2"
+		>
+			<div class="space-y-4">
+				<div class="flex space-x-2">
+					<Avatar src="/teacher-avatar.png" name="Teacher" />
+					<div class="assistant-chat">Hello! How can I help you?</div>
+				</div>
+				<!-- Need to display each chat item here -->
+				{#each chatHistory as chat, i}
+					{#if chat.role === 'user'}
+						<div class="ml-auto flex justify-end">
+							<div>
+								<Avatar src="/gabbe-avatar.webp" name="User image" />
+							</div>
+							<div class="user-chat">
+								{chat.content}
+							</div>
+						</div>
+						<!-- this else handles the assistant role chat display -->
+					{:else}
+						<div class="mr-auto flex">
+							<div>
+								<Avatar src="/teacher-avatar.png" name="Teacher image" />
+							</div>
+							<div class="assistant-chat">
+								{@html chat.content}
+							</div>
+						</div>
+					{/if}
+				{/each}
+
+				{#if response.loading}
+					{#await new Promise((res) => setTimeout(res, 400)) then _}
+						<div class="flex">
+							<div class="flex space-x-2">
+								<Avatar name="gabbe avatar image" src={'/img-gabbe-avatar.webp'} />
+								<div class="assistant-chat">
+									{#if response.text === ''}
+										<TypingIndicator />
+									{:else}
+										{@html responseText}
+									{/if}
+								</div>
+							</div>
+						</div>
+					{/await}
+				{/if}
+				<div class="space-y-4">
+					<hr />
+					<div class="flex space-x-4">
+						<textarea
+							class="textarea"
+							required
+							placeholder="Type your message..."
+							name="message"
+							rows="3"
+							bind:value={examplePrompt}
+						></textarea>
+						<div class="flex flex-col justify-between">
+							<button type="submit" class="bg-cyan-600 text-white pb-2">Send</button>
+							<button type="button" class="bg-red-600 text-white" onclick={deleteAllChats}
+								>Clear Chats</button
+							>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="flex w-full flex-col items-center">
+				<p class="text-center text-sm text-surface-500 ">
+					You can also upload a file for additional context to chat with me. I will do my best to
+					help you.
+				</p>
+				{#if fileNames.length > 0}
+					<div class="flex items-center gap-4">
+						{#each fileNames as fileName}
+							<div class="flex items-center gap-2">
+								<button
+									type="button"
+									class="btn preset-filled-primary-500 ">
+									<span>{fileName}</span>
+									<CircleX onclick={() => deleteFileName(fileName)} />
+								</button>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		</form>
+	</div>
+
+	
+</main>
+
+<style lang="postcss">
+	.assistant-chat {
+		@apply rounded-lg bg-primary-100 p-2;
+	}
+
+	.user-chat {
+		@apply rounded-lg bg-surface-200 p-2;
+	}
+
+	.assistant-chat :global {
+		ol {
+			@apply ml-4 list-inside list-decimal;
+		}
+		ul {
+			@apply ml-4 list-inside list-disc;
+		}
+		/* Code blocks */
+	/* 	pre {
+			@apply my-4 overflow-x-auto rounded-lg bg-surface-700 p-4;
+		}
+		code {
+			@apply rounded bg-surface-100 px-1 py-0.5 font-mono;
+		}
+ */
+		/* Headers */
+		h1 {
+			@apply mb-4 text-2xl font-bold;
+		}
+		h2 {
+			@apply mb-3 text-xl font-bold;
+		}
+		h3 {
+			@apply mb-2 text-lg font-bold;
+		}
+
+		/* Links */
+		a {
+			@apply text-primary-500 hover:underline;
+		}
+
+		/* Blockquotes */
+		blockquote {
+			@apply border-l-4 border-surface-500 pl-4 italic;
+		}
+	}
+</style>
