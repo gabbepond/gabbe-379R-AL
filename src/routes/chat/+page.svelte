@@ -160,7 +160,7 @@
 					{#if chat.role === 'user'}
 						<div class="ml-auto flex justify-end">
 							<div>
-								<Avatar src="/gabbe-avatar.webp" name="User image" />
+								<Avatar src="/teacher-avatar.png" name="User image" />
 							</div>
 							<div class="user-chat">
 								{chat.content}
@@ -170,7 +170,7 @@
 					{:else}
 						<div class="mr-auto flex">
 							<div>
-								<Avatar src="/teacher-avatar.png" name="Teacher image" />
+								<Avatar src="/gabbe-avatar.webp" name="Teacher image" />
 							</div>
 							<div class="assistant-chat">
 								{@html chat.content}
@@ -183,7 +183,7 @@
 					{#await new Promise((res) => setTimeout(res, 400)) then _}
 						<div class="flex">
 							<div class="flex space-x-2">
-								<Avatar name="gabbe avatar image" src={'/img-gabbe-avatar.webp'} />
+								<Avatar name="gabbe avatar image" src='/gabbe-avatar.webp' />
 								<div class="assistant-chat">
 									{#if response.text === ''}
 										<TypingIndicator />

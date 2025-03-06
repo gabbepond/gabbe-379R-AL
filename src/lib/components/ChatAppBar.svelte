@@ -35,9 +35,9 @@ let systemPrompts = [
     } */
   </script>
   
-  <nav class="bg-primary-800 w-full p-4">
+  <nav class="bg-primary-800 w-full p-2">
     <div class="container mx-auto flex items-center justify-between">
-      <div class="text-white font-bold text-xl">AI Chat Experiments</div>
+      <div class="text-white font-bold text-xl">Goo Chatbot </div>
       
       <div class="flex items-center space-x-4">
         <!-- System Prompt Dropdown -->
