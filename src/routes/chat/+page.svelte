@@ -152,7 +152,7 @@
 		>
 			<div class="space-y-4">
 				<div class="flex space-x-2">
-					<Avatar src="/teacher-avatar.png" name="Teacher" />
+					<Avatar src="/gabbe-avatar.webp" name="Teacher" />
 					<div class="assistant-chat">Hello! How can I help you?</div>
 				</div>
 				<!-- Need to display each chat item here -->
