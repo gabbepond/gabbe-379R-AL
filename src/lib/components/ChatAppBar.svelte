@@ -87,9 +87,9 @@ let systemPrompts = [
   </nav>
   
 {#if selectedSystemPrompt}
-    <div class="bg-yellow-100 p-4 mt-4">
+    <!-- <div class="bg-yellow-100 p-4 mt-4">
       <p class="text-yellow-800">System Prompt: {selectedSystemPrompt}</p>
-    </div>
+    </div> -->
   {/if}
   
   <!-- gabbe -->

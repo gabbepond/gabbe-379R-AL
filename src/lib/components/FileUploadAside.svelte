@@ -16,7 +16,7 @@
             <span class="label-text">Select a file</span>
             <input class="input" type="file" accept=".pdf" name="file" />
         </label>
-        <button class="btn preset-filled-primary-200-800" type="submit">Upload chosen file</button>
+        <button class="btn bg-cyan-600 text-white" type="submit">Upload Chosen File</button>
     </form>
 </div>
  <!-- gabbe -->

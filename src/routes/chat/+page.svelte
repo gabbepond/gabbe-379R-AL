@@ -199,7 +199,7 @@
 					<hr />
 					<div class="flex space-x-4">
 						<textarea
-							class="textarea"
+							class="textarea p-5"
 							required
 							placeholder="Type your message..."
 							name="message"
@@ -207,8 +207,8 @@
 							bind:value={examplePrompt}
 						></textarea>
 						<div class="flex flex-col justify-between">
-							<button type="submit" class="bg-cyan-600 text-white pb-2">Send</button>
-							<button type="button" class="bg-red-600 text-white" onclick={deleteAllChats}
+							<button type="submit" class="bg-cyan-600 text-white p-2 rounded-lg border-gray-800 border-2">Send</button>
+							<button type="button" class="bg-red-600 text-white rounded-lg border-gray-800 border-2 mt-2" onclick={deleteAllChats}
 								>Clear Chats</button
 							>
 						</div>
@@ -216,11 +216,10 @@
 				</div>
 			</div>
 			<div class="flex w-full flex-col items-center">
-				<p class="text-center text-sm text-surface-500 ">
-					You can also upload a file for additional context to chat with me. I will do my best to
-					help you.
+				<p class="text-center text-sm text-surface-500 m-4">
+					⬅️ You Can Upload Content by Selecting Files.
 				</p>
-				<p>{fileNames.length}</p>
+				<!-- <p>{fileNames.length}</p> -->
 				{#if fileNames.length > 0}
 					<div class="flex items-center gap-4">
 						{#each fileNames as fileName}
