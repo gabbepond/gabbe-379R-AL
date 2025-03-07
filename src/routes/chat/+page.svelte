@@ -220,6 +220,7 @@
 					You can also upload a file for additional context to chat with me. I will do my best to
 					help you.
 				</p>
+				<p>{fileNames.length}</p>
 				{#if fileNames.length > 0}
 					<div class="flex items-center gap-4">
 						{#each fileNames as fileName}

@@ -82,7 +82,7 @@ async function run() {
     console.log('Starting user embedded file schema creation...')
 
    client = await connectToWeaviate()
-    //await addCollection()
+    await addCollection()
     //await client.collections.delete('Chunks')
     await getCollectionCount('Chunks')
 
