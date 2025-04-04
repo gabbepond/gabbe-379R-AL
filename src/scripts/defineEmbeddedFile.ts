@@ -3,15 +3,15 @@ import weaviate, { dataType, type WeaviateClient, type Collection } from 'weavia
 let client: WeaviateClient
 
 
-async function connectToWeaviate() : Promise<WeaviateClient> {
-    const clientPromise = weaviate.connectToCustom({
-		httpHost: 'localhost',
-		httpPort: 8080,
-		grpcHost: 'localhost',
-		grpcPort: 50051
-	});
-	return clientPromise;
-}
+// async function connectToWeaviate() : Promise<WeaviateClient> {
+//     const clientPromise = weaviate.connectToCustom({
+// 		httpHost: 'localhost',
+// 		httpPort: 8080,
+// 		grpcHost: 'localhost',
+// 		grpcPort: 50051
+// 	});
+// 	return clientPromise;
+// }
 
 const embeddedFileSchema = {
     name: 'Chunks',

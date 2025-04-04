@@ -1,27 +1,87 @@
 <script lang="ts">
-	import { AppBar } from '@skeletonlabs/skeleton-svelte';
-	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
-	import Paperclip from 'lucide-svelte/icons/paperclip';
-	import Calendar from 'lucide-svelte/icons/calendar';
-	import CircleUser from 'lucide-svelte/icons/circle-user';
+	import { enhance } from '$app/forms'
+	import type { ActionData, PageData } from './$types'
+    import type { ActionResult } from '@sveltejs/kit'
+    
+	//import { testData } from './test-data';
+
+	type ImageResult = {
+		id: string
+		thumbnailUrl: string
+		title: string
+	}
+
+	const props = $props<{ data: PageData; form: ActionData }>()
+
+	// Track search state
+	let searchPerformed = $state(false)
+	let searchQuery = $state('')
+	let results = $state<ImageResult[]>([])
+
+	function processSubmit() {
+        return async ({ result }: { result: ActionResult }) => {
+            console.log('Form submission result:', result)
+            if (result.type === 'success' && result.data) {
+				searchPerformed = true
+				searchQuery = result.data.searchQuery || ''
+
+				// Ensure we have an array of properly typed objects
+				if (Array.isArray(result.data.images)) {
+					results = result.data.images.map((img: any) => ({
+						id: img.id || '',
+						title: img.title || 'Untitled',
+						thumbnailUrl: img.thumbnailUrl || '',
+						...img // Include any other properties
+					}))
+				} else {
+					results = []
+				}
+
+				console.log(`Got ${results.length} results for "${searchQuery}"`)
+			}
+        }
+    }
 </script>
 
-<AppBar>
-	{#snippet lead()}
-		<ArrowLeft size={24} />
-	{/snippet}
-	{#snippet trail()}
-		<Paperclip size={20} />
-		<Calendar size={20} />
-		<CircleUser size={20} />
-	{/snippet}
-	{#snippet children()}
-		<p class="text-pink-100">Center Align</p>
-	{/snippet}
-	<!--     {#snippet headline()}
-      <p class="bg-slate-700 text-indigo-200 text-center">Headline</p>
-    {/snippet} -->
-</AppBar>
+<main class="container mx-auto max-w-4xl p-4">
+	<h1 class="text-primary-700 mb-6 text-center text-3xl font-bold">AI Image Search</h1>
+	<div class="mb-8 rounded-lg bg-white p-6 shadow-lg">
+		<h2 class="mb-4 text-xl font-semibold">Search Images</h2>
+		<form method="POST" action="?/imageSearch" use:enhance={processSubmit} class="flex items-center space-x-2">
+			<div class="flex-grow">
+				<input
+					type="text"
+					name="query"
+					placeholder="Search for images"
+					class="w-full rounded-lg border border-gray-300 p-2" />
+			</div>
+			<button type="submit" class="bg-primary-500 rounded-lg p-2 text-white"> Search </button>
+		</form>
+	</div>
 
-<h1 class="m-6 text-center text-4xl">Welcome to Gabbe Full_Stack SvelteKit App!</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+    	<!-- Debug information -->
+	<div class="mb-4 rounded bg-gray-100 p-3 text-sm">
+		<p>Search performed: {searchPerformed ? 'Yes' : 'No'}</p>
+		<p>Query: {searchQuery || 'None'}</p>
+		<p>Results count: {results.length}</p>
+	</div>
+
+	<div>
+		{#each results as result, i}
+			<li class="flex items-center space-x-4">
+				<span
+					class="bg-primary-100 text-primary-800 flex h-8 w-8 items-center justify-center rounded-full font-bold">
+					{i + 1}
+				</span>
+				<div>
+					<p>Title: {result.title}</p>
+					<img src={result.thumbnailUrl} alt={result.title} class="h-32 w-32" />
+				</div>
+			</li>
+		{/each}
+	</div>
+
+	<div class="mt-8 text-center">
+		<a href="/images" class="text-primary-600 hover:underline">Back to Image Collection</a>
+	</div>
+</main>
