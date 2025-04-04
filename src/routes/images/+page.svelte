@@ -4,7 +4,12 @@
 	import { invalidateAll } from '$app/navigation'
 
 	// Converting props to $props rune
+	// const { data, form } = $props<{ data: PageData; form: ActionData }>()
 	const { data, form } = $props<{ data: PageData; form: ActionData }>()
+
+
+
+
 
 	let selectedFile: File | null = null
 	let previewUrl = $state<string | null>(null)
@@ -12,6 +17,7 @@
 
 	// Get existing images from server data
 	let images = data.images || []
+	console.log('Loaded images:', images.length, data)
 
 	const maxSizeInBytes = 10 * 1024 * 1024 // 10MB
 
@@ -56,6 +62,17 @@
 		}
 	})
 </script>
+<nav class="text-gray-800 bg-white p-6">
+    <div class="flex justify-between items-center">
+
+        
+        <div class="flex space-x-4">
+            <a href="/" class="hover:text-red-400">Home</a>
+            <a href="/chat" class="hover:text-red-400">Chat</a>
+            <a href="/images" class="hover:text-red-400">Images</a>
+        </div>
+    </div>
+</nav>
 
 <svelte:head>
 	<title>Image Upload | AI Image Collection</title>

@@ -5,8 +5,20 @@
 	import Calendar from 'lucide-svelte/icons/calendar';
 	import CircleUser from 'lucide-svelte/icons/circle-user';
 </script>
+<nav class="text-gray-800 bg-white p-6">
+    <div class="flex justify-between items-center">
 
-<AppBar>
+        
+        <div class="flex space-x-4">
+            <a href="/" class="hover:text-red-400">Home</a>
+            <a href="/chat" class="hover:text-red-400">Chat</a>
+            <a href="/images" class="hover:text-red-400">Images</a>
+        </div>
+    </div>
+</nav>
+
+
+<!-- <AppBar>
 	{#snippet lead()}
 		<ArrowLeft size={24} />
 	{/snippet}
@@ -16,13 +28,13 @@
 		<CircleUser size={20} />
 	{/snippet}
 	{#snippet children()}
-		<p class="text-blue-500">svelte</p>
+		
 	{/snippet}
-	<!--     {#snippet headline()}
-      <p class="bg-slate-700 text-indigo-200 text-center">Headline</p>
-    {/snippet} -->
-</AppBar>
+	    {#snippet headline()}
+      <p class=" text-black text-center">Gabbe's SvelteKit APP AI</p>
+    {/snippet}
+</AppBar> -->
 
-<h1 class="m-6 text-center text-4xl text-purple-600">Welcome to Gab's Full Stack SvelteKit App!</h1>
-<p class="text-center">Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<h1 class="pt-6 pb-6 text-center text-4xl text-black bg-pink-200">Welcome to Gab's Full Stack SvelteKit App!</h1>
+<p class="text-center p-2">Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
 
