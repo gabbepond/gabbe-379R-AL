@@ -62,7 +62,7 @@
 </svelte:head>
 
 <main class="container mx-auto max-w-4xl p-4">
-	<h1 class="text-primary-700 mb-6 text-center text-3xl font-bold">
+	<h1 class="text-primary-700 mb-6 text-center text-3xl font-bold ">
 		{#if data.searchPerformed}
 			Search Results: "{data.searchQuery}"
 		{:else}
@@ -70,7 +70,7 @@
 		{/if}
 	</h1>
 
-	<div class="mb-4 text-center">
+	<div class="mb-4 text-center ">
 		<a
 			href="/search"
 			class="bg-primary-100 text-primary-800 hover:bg-primary-200 inline-block rounded-md px-4 py-2 transition">
@@ -78,7 +78,7 @@
 		</a>
 	</div>
 
-	<div class="mb-8 rounded-lg bg-white p-6 shadow-lg">
+	<div class="mb-8 rounded-lg bg-white p-6 shadow-lg ">
 		<h2 class="mb-4 text-xl font-semibold">Upload a New Image</h2>
 
 		<form

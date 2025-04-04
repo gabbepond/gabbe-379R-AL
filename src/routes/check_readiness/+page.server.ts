@@ -4,7 +4,7 @@ import type { PageServerLoad } from './$types'
 
 let client: WeaviateClient
 
-// the following function is custom for Thor's machine only!!
+// Ensure the client is initialized properly
 async function connectToWeaviate() : Promise<WeaviateClient> {
     const clientPromise = weaviate.connectToCustom({
 		httpHost: 'localhost',
@@ -16,9 +16,9 @@ async function connectToWeaviate() : Promise<WeaviateClient> {
 }
 
 export const load: PageServerLoad = async () => {
-    // Only Thor needs to use his custom connectToWeaviate function
+    
     client = await connectToWeaviate()
-    // everyone but Thor should uncomment and use the following line
+   
     //client = await weaviate.connectToLocal()
 
     const clientReadiness = await client.isReady()

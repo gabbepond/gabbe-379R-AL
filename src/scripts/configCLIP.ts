@@ -2,7 +2,7 @@ import weaviate, { type WeaviateClient, type Collection } from 'weaviate-client'
 
 let client: WeaviateClient
 
-// the following function is custom for Thor's machine only!!
+
 async function connectToWeaviate() : Promise<WeaviateClient> {
     const clientPromise = weaviate.connectToCustom({
 		httpHost: 'localhost',
