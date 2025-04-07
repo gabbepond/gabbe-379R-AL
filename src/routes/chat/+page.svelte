@@ -8,6 +8,7 @@
 	import ChatAppBar from '$lib/components/ChatAppBar.svelte';
 	import FileUploadAside from '$lib/components/FileUploadAside.svelte';
 	import { CircleX } from 'lucide-svelte'
+	// import type { PageData } from './$types';
 	
 
 	import hljs from 'highlight.js';
@@ -44,6 +45,7 @@
 	$effect(() => {
 		if (data?.fileNames) {
 			fileNames = [...data.fileNames]
+			console.log("File names loaded from page data:", fileNames);
 		}
 	})
 

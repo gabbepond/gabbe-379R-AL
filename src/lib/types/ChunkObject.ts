@@ -6,5 +6,5 @@ export interface ChunkObject {
         pageNumberLocation: number;
         chunkIndex: number;
     };
-    [key: string]: unknown;
+    [key: string]: any;
 }

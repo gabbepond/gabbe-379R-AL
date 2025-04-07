@@ -23,7 +23,7 @@ const uploadPath = process.env.NODE_ENV === 'production'
     : path.resolve(__dirname, '../../uploads');
 
 // Ensure upload directory exists
-await fsPromises.mkdir(uploadPath, { recursive: true });
+// await fsPromises.mkdir(uploadPath, { recursive: true });
 
 // ✅ Connect to Weaviate
 async function connectToWeaviate(): Promise<WeaviateClient> {
@@ -82,7 +82,8 @@ export const actions = {
             const formData = await request.formData();
             console.log('Received form data:', [...formData.entries()]);
 
-            const uploadedFile = formData?.get('file');
+            // const uploadedFile = formData?.get('file');
+            const uploadedFile = formData?.get('file') as unknown as File | undefined
             if (!uploadedFile || typeof uploadedFile.name !== 'string') {
                 console.error('Invalid file received:', uploadedFile);
                 return { status: 400, body: { error: 'Invalid file uploaded' } };
