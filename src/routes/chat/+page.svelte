@@ -137,7 +137,7 @@
 		fileNames = fileNames.filter((name) => name !== fileName)
 	}
 </script>
-<nav class="text-gray-800 bg-white p-6">
+<!-- <nav class="text-gray-800 bg-white p-6">
     <div class="flex justify-between items-center">
 
         
@@ -147,7 +147,7 @@
             <a href="/images" class="hover:text-red-400">Images</a>
         </div>
     </div>
-</nav>
+</nav> -->
 
 <main class="flex min-h-screen w-screen flex-col items-center bg-pink-100">
 	<!-- The app bar for this page -->

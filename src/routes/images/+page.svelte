@@ -7,10 +7,6 @@
 	// const { data, form } = $props<{ data: PageData; form: ActionData }>()
 	const { data, form } = $props<{ data: PageData; form: ActionData }>()
 
-
-
-
-
 	let selectedFile: File | null = null
 	let previewUrl = $state<string | null>(null)
 	let loading = $state(false)
@@ -62,7 +58,7 @@
 		}
 	})
 </script>
-<nav class="text-gray-800 bg-white p-6">
+<!-- <nav class="text-gray-800 bg-white p-6">
     <div class="flex justify-between items-center">
 
         
@@ -72,7 +68,7 @@
             <a href="/images" class="hover:text-red-400">Images</a>
         </div>
     </div>
-</nav>
+</nav> -->
 
 <svelte:head>
 	<title>Image Upload | AI Image Collection</title>
@@ -127,7 +123,7 @@
 					required
 					onchange={handleFileSelect}
 					class="file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 block
-                           w-full text-sm text-gray-500
+                        	text-sm text-gray-500
                            file:mr-4 file:rounded-md
                            file:border-0 file:px-4
                            file:py-2 file:text-sm

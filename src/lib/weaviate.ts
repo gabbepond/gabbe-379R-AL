@@ -15,11 +15,11 @@ export async function connectToWeaviate(): Promise<WeaviateClient> {
 
   const clientPromise = weaviate.connectToCustom({
     httpHost: 'localhost',
-    httpPort: 8084,
+    httpPort: 8080,
     grpcHost: 'localhost',
-    grpcPort: 50054,
+    grpcPort: 50051,
     headers: {
-      'X-OpenAI-Api-Key': process.env.OPENAI_API_KEY as string
+      'x-openai-api-key': String(process.env.OPENAI_API_KEY || '')
     }
   });
 

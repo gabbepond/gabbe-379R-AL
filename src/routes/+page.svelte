@@ -5,7 +5,7 @@
 	import Calendar from 'lucide-svelte/icons/calendar';
 	import CircleUser from 'lucide-svelte/icons/circle-user';
 </script>
-<nav class="text-gray-800 bg-white p-6">
+<!-- <nav class="text-gray-800 bg-white p-6">
     <div class="flex justify-between items-center">
 
         
@@ -15,7 +15,7 @@
             <a href="/images" class="hover:text-red-400">Images</a>
         </div>
     </div>
-</nav>
+</nav> -->
 
 
 <!-- <AppBar>
