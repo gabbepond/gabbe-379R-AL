@@ -77,9 +77,9 @@ async function run() {
     console.log('Starting user embedded file schema creation...')
 
     client = await connectToWeaviate()
-    await addCollection()
-    //await client.collections.delete('ImageCollection')
-    await getCollectionCount('ImageCollection')
+    await addCollection() //comment out for delete
+    //await client.collections.delete('ImageCollection') //un-comment when deleteing, comment out line above and below "add and get"
+    await getCollectionCount('ImageCollection') //comment out for delete
 
     const endTime: Date = new Date()
     const elapsedTime: number = endTime.getTime() - startTime.getTime();
