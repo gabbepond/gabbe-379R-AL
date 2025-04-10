@@ -81,10 +81,14 @@ async function run() {
     const startTime: Date = new Date()
     console.log('Starting user embedded file schema creation...')
 
-   client = await connectToWeaviate()
+    client = await connectToWeaviate()
     await addCollection()
     //await client.collections.delete('Chunks')
     await getCollectionCount('Chunks')
+    // npm run localDockerRestart
+    //npm run defineEmbeddedFile
+
+   
 
     const endTime: Date = new Date()
     const elapsedTime: number = endTime.getTime() - startTime.getTime();

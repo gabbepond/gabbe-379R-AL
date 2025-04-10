@@ -79,7 +79,10 @@ async function run() {
     client = await connectToWeaviate()
     await addCollection() //comment out for delete
     //await client.collections.delete('ImageCollection') //un-comment when deleteing, comment out line above and below "add and get"
-    await getCollectionCount('ImageCollection') //comment out for delete // npm run localDockerRestart
+    await getCollectionCount('ImageCollection') //comment out for delete 
+     // npm run localDockerRestart
+    // npm run configCLIP
+   
 
     const endTime: Date = new Date()
     const elapsedTime: number = endTime.getTime() - startTime.getTime();

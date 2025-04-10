@@ -74,8 +74,8 @@
 	<title>Image Upload | AI Image Collection</title>
 </svelte:head>
 
-<main class="container mx-auto max-w-4xl p-4">
-	<h1 class="text-primary-700 mb-6 text-center text-3xl font-bold ">
+<main class="container mx-auto w-full p-4 bg-pink-100 ">
+	<h1 class="text-black mb-6 text-center text-3xl font-bold ">
 		{#if data.searchPerformed}
 			Search Results: "{data.searchQuery}"
 		{:else}
@@ -85,10 +85,11 @@
 
 	<div class="mb-4 text-center ">
 		<a
-			href="/search"
-			class="bg-primary-100 text-primary-800 hover:bg-primary-200 inline-block rounded-md px-4 py-2 transition">
-			Search Images
-		</a>
+		href="/search"
+		class="bg-gray-400 text-gray-900 hover:bg-rose-400 inline-block rounded-md px-4 py-2 transition border border-black">
+		Search Images
+	  	</a>
+	  
 	</div>
 
 	<div class="mb-8 rounded-lg bg-white p-6 shadow-lg ">
@@ -158,7 +159,7 @@
 			<button
 				type="submit"
 				disabled={loading}
-				class="bg-primary-600 hover:bg-primary-700 w-full rounded-md px-4 py-2 font-bold text-white transition duration-200 disabled:bg-gray-400">
+				class="bg-rose-400 text-white w-full rounded-md px-4 py-2 font-bold transition duration-200 disabled:bg-gray-400">
 				{loading ? 'Uploading...' : 'Upload Image'}
 			</button>
 
@@ -174,19 +175,19 @@
 	{#if images.length > 0}
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
 			{#each images as image}
-				<div class="rounded-md border p-2 transition-shadow hover:shadow-md">
+				<div class="rounded-sm border p-2 transition-shadow hover:shadow-md bg-gray-100">
 					{#if image.thumbnailUrl}
 						{@const debugUrl = image.thumbnailUrl}
 						{@const showDebug = () => console.log('Thumbnail URL:', debugUrl)}
 						<img
 							src={image.thumbnailUrl}
 							alt={image.title}
-							class="h-40 w-full rounded object-cover"
+							class="h-40 w-full rounded-md object-cover"
 							loading="lazy"
 							onerror={() => console.error(`Failed to load thumbnail: ${image.thumbnailUrl}`)}
 							onload={showDebug} />
 					{:else}
-						<div class="flex h-40 items-center justify-center rounded bg-gray-200">
+						<div class="flex h-40 items-center justify-center rounded-md">
 							<div class="text-gray-500">[No thumbnail: {JSON.stringify(image)}]</div>
 						</div>
 					{/if}
