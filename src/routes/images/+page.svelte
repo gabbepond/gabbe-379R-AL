@@ -86,13 +86,13 @@
 	<div class="mb-4 text-center ">
 		<a
 		href="/search"
-		class="bg-gray-400 text-gray-900 hover:bg-rose-400 inline-block rounded-md px-4 py-2 transition border border-black">
-		Search Images
+		class="bg-gray-700 text-white hover:bg-red-600 inline-block rounded-md px-4 py-2 transition border border-black">
+		SEARCH IMAGES
 	  	</a>
 	  
 	</div>
 
-	<div class="mb-8 rounded-lg bg-white p-6 shadow-lg ">
+	<div class="mb-8 rounded-lg bg-pink-100 p-6 shadow-lg border-8 border-black">
 		<h2 class="mb-4 text-xl font-semibold">Upload a New Image</h2>
 
 		<form

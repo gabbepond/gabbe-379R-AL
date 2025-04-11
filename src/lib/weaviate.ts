@@ -44,3 +44,6 @@ export async function isWeaviateReady(): Promise<boolean> {
   const weaviateClient = await connectToWeaviate();
   return weaviateClient.isReady();
 }
+
+
+

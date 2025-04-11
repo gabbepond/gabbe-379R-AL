@@ -28,7 +28,7 @@ export const actions: Actions = {
 
         // get the ImageCollection
         const collection = client.collections.get('ImageCollection')
-
+        console.log('GOOcollection:', collection)
         // perform a vector search using the query
         // Use nearText for semantic search
 
@@ -39,6 +39,7 @@ export const actions: Actions = {
         })
 
         let images: SearchResultImage[] = []
+        console.log('GOOsearchResults:', images) 
 
         if (searchResults.objects) {
             images = searchResults.objects.map((obj, index) => {

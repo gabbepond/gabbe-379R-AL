@@ -9,6 +9,7 @@
 		id: string
 		thumbnailUrl: string
 		title: string
+		[key: string]: any // Allow for additional properties
 	}
 
 	const props = $props<{ data: PageData; form: ActionData }>()
@@ -24,6 +25,7 @@
             if (result.type === 'success' && result.data) {
 				searchPerformed = true
 				searchQuery = result.data.searchQuery || ''
+				console.log('GOOHEREProcessing search results...', result.data.searchQuery)
 
 				// Ensure we have an array of properly typed objects
 				if (Array.isArray(result.data.images)) {
@@ -68,15 +70,18 @@
 
 	<div>
 		{#each results as result, i}
-			<li class="flex items-center space-x-4">
+			<li class="flex items-center space-x-4 mt-4">
 				<span
 					class="bg-primary-100 text-primary-800 flex h-8 w-8 items-center justify-center rounded-full font-bold">
 					{i + 1}
 				</span>
 				<div>
-					<p>Title: {result.title}</p>
+					<p class="font-bold text-center"> {result.title}</p>
 					<img src={result.thumbnailUrl} alt={result.title} class="h-32 w-32" />
 				</div>
+				<div class="ml-10 text-left font-italic justify-evenly">
+					<p>Distance:    {result.distance}</p>
+					<p>Match Score: {result.matchScore}</p>
 			</li>
 		{/each}
 	</div>
