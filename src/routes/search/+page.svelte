@@ -68,23 +68,29 @@
 		<p>Results count: {results.length}</p>
 	</div>
 
-	<div>
-		{#each results as result, i}
-			<li class="flex items-center space-x-4 mt-4">
-				<span
-					class="bg-primary-100 text-primary-800 flex h-8 w-8 items-center justify-center rounded-full font-bold">
-					{i + 1}
-				</span>
-				<div>
-					<p class="font-bold text-center"> {result.title}</p>
-					<img src={result.thumbnailUrl} alt={result.title} class="h-32 w-32" />
-				</div>
-				<div class="ml-10 text-left font-italic justify-evenly">
-					<p>Distance:    {result.distance}</p>
-					<p>Match Score: {result.matchScore}</p>
-			</li>
-		{/each}
-	</div>
+<div>
+	{#each results as result, i}
+		<li class="flex items-start space-x-6 mt-4">
+			<!-- Number Badge -->
+			<span class="bg-primary-100 text-primary-800 flex h-8 w-8 items-center justify-center rounded-full font-bold">
+				{i + 1}
+			</span>
+
+			<!-- Image and Title -->
+			<div class="flex flex-col items-start">
+				<p class="font-bold">{result.title}</p>
+				<img src={result.thumbnailUrl} alt={result.title} class="h-32 w-32" />
+			</div>
+
+			<!-- Text Information -->
+			<div class="m-10 flex flex-col justify-between text-italic">
+				<p>Distance: {result.distance}</p>
+				<p>Match Score: {result.matchScore}</p>
+			</div>
+		</li>
+	{/each}
+</div>
+
 
 	<div class="mt-8 text-center">
 		<a href="/images" class="text-primary-600 hover:underline">Back to Image Collection</a>
