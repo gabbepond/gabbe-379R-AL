@@ -168,25 +168,30 @@
 		>
 			<div class="space-y-4">
 				<div class="flex space-x-2">
-					<Avatar src="/gabbe-avatar.webp" name="Teacher" />
+					<Avatar name="Teacher image"  src="/gabbe-avatar2.webp" />
 					<div class="assistant-chat">Hello! How can I help you?</div>
 				</div>
 				<!-- Need to display each chat item here -->
+				 
 				{#each chatHistory as chat, i}
+
 					{#if chat.role === 'user'}
-						<div class="ml-auto flex justify-end">
+				
+					
+						<div class="mr-auto flex justify-end">
 							<div>
-								<Avatar src="/teacher-avatar.png" name="User image" />
+								<Avatar name="Teacher image"  src="/dodger-avatar2.webp"/>
 							</div>
 							<div class="user-chat">
 								{chat.content}
+								
 							</div>
 						</div>
 						<!-- this else handles the assistant role chat display -->
 					{:else}
 						<div class="mr-auto flex">
 							<div>
-								<Avatar src="/gabbe-avatar.webp" name="Teacher image" />
+								<Avatar  name="Teacher image"  src="/gabbe-avatar2.webp"/>
 							</div>
 							<div class="assistant-chat">
 								{@html chat.content}
@@ -199,7 +204,7 @@
 					{#await new Promise((res) => setTimeout(res, 400)) then _}
 						<div class="flex">
 							<div class="flex space-x-2">
-								<Avatar name="gabbe avatar image" src='/gabbe-avatar.webp' />
+								<Avatar name="gabbe avatar image" src='/gabbe-avatar2.webp' />
 								<div class="assistant-chat">
 									{#if response.text === ''}
 										<TypingIndicator />
