@@ -46,33 +46,33 @@
 </script>
 
 <main class="container mx-auto max-w-4xl p-4">
-	<h1 class="text-primary-700 mb-6 text-center text-3xl font-bold">AI Image Search</h1>
+	<h1 class="text-rose-400 mb-6 text-center text-3xl font-bold">AI Image Search</h1>
 	<div class="mb-8 rounded-lg bg-white p-6 shadow-lg">
 		<h2 class="mb-4 text-xl font-semibold">Search Images</h2>
 		<form method="POST" action="?/imageSearch" use:enhance={processSubmit} class="flex items-center space-x-2">
-			<div class="flex-grow">
+			<div class="flex-grow ">
 				<input
 					type="text"
 					name="query"
 					placeholder="Search for images"
 					class="w-full rounded-lg border border-gray-300 p-2" />
 			</div>
-			<button type="submit" class="bg-primary-500 rounded-lg p-2 text-white"> Search </button>
+			<button type="submit" class="bg-rose-400 rounded-lg p-2 text-white"> Search </button>
 		</form>
 	</div>
 
     	<!-- Debug information -->
-	<div class="mb-4 rounded bg-gray-100 p-3 text-sm">
+	<!-- <div class="mb-4 rounded bg-gray-100 p-3 text-sm">
 		<p>Search performed: {searchPerformed ? 'Yes' : 'No'}</p>
 		<p>Query: {searchQuery || 'None'}</p>
 		<p>Results count: {results.length}</p>
-	</div>
+	</div> -->
 
 <div>
 	{#each results as result, i}
 		<li class="flex items-start space-x-6 mt-4">
 			<!-- Number Badge -->
-			<span class="bg-primary-100 text-primary-800 flex h-8 w-8 items-center justify-center rounded-full font-bold">
+			<span class="bg-rose-400 text-white flex h-8 w-8 items-center justify-center rounded-full font-bold">
 				{i + 1}
 			</span>
 
@@ -93,6 +93,6 @@
 
 
 	<div class="mt-8 text-center">
-		<a href="/images" class="text-primary-600 hover:underline">Back to Image Collection</a>
+		<a href="/images" class="text-rose-400 hover:underline">Back to Image Collection</a>
 	</div>
 </main>
