@@ -129,8 +129,11 @@
 	
 
 	function deleteAllChats() {
+		console.log('Deleting all chats');
 		chatHistory = [];
 	}
+
+
 
 	function deleteFileName(fileName: string) {
 		// Update the local state instead of the prop
