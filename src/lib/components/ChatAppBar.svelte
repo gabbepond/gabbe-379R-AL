@@ -33,6 +33,7 @@ let systemPrompts = [
     function handleExamplePromptChange(event: Event & { currentTarget: EventTarget & HTMLSelectElement }) {
         selectedExamplePrompt = event.currentTarget.value;
     } */
+  //  Gabbe
   </script>
   
   <nav class="bg-primary-800 w-full p-2">
