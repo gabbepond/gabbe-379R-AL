@@ -85,7 +85,7 @@ Previous context: "${chats.slice(-2, -1).map((chat) => chat.content).join('\n')}
 				SYSTEM_PROMPTS[systemPrompt as SystemPromptKey] ?? SYSTEM_PROMPTS['Helpful Assistant']
 
 			const stream = await openai.chat.completions.create({
-				model: deepSeek ? 'deepseek-r1:8b' : 'llama3.2',
+				model: deepSeek ? 'deepseek-r1:8b' : 'llama3',
 				messages: [{ role: 'system', content: selectedPrompt }, ...body.chats],
 				stream: true
 			})

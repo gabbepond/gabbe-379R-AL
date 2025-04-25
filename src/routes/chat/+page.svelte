@@ -1,137 +1,157 @@
 <script lang="ts">
-	import { Avatar } from '@skeletonlabs/skeleton-svelte';
-	import TypingIndicator from '$lib/utils/typingIndicator.svelte';
-	import { readableStreamStore } from '$lib/readableStreamStore.svelte';
-	import { Marked } from 'marked';
-	import { markedHighlight } from 'marked-highlight';
-	import DOMPurify from 'dompurify';
-	import ChatAppBar from '$lib/components/ChatAppBar.svelte';
-	import FileUploadAside from '$lib/components/FileUploadAside.svelte';
-	import { CircleX } from 'lucide-svelte';
+    import { Avatar } from '@skeletonlabs/skeleton-svelte'
+    import TypingIndicator from '$lib/utils/typingIndicator.svelte'
+    import { readableStreamStore } from '$lib/readableStreamStore.svelte'
+    import { Marked } from 'marked'
+    import { markedHighlight } from 'marked-highlight'
+    import DOMPurify from 'dompurify'
+    import ChatAppBar from '$lib/components/ChatAppBar.svelte'
+    import FileUploadAside from '$lib/components/FileUploadAside.svelte'
+    import { CircleX } from 'lucide-svelte'
 
 	import BotIcon from 'lucide-svelte/icons/bot';
 	import MessageSquare from 'lucide-svelte/icons/message-square';
 	import Image from 'lucide-svelte/icons/image';
 	import Home from 'lucide-svelte/icons/home';
 
-	import hljs from 'highlight.js';
-	import javascript from 'highlight.js/lib/languages/javascript';
-	import typescript from 'highlight.js/lib/languages/typescript';
-	import css from 'highlight.js/lib/languages/css';
+    import hljs from 'highlight.js'
+    import javascript from 'highlight.js/lib/languages/javascript'
+    import typescript from 'highlight.js/lib/languages/typescript'
+    import css from 'highlight.js/lib/languages/css'
+    hljs.registerLanguage('javascript', javascript)
+    hljs.registerLanguage('typescript', typescript)
+    hljs.registerLanguage('css', css)
 
-	hljs.registerLanguage('javascript', javascript);
-	hljs.registerLanguage('typescript', typescript);
-	hljs.registerLanguage('css', css);
+    const marked = new Marked(
+        markedHighlight({
+            langPrefix: 'hljs language-',
+            highlight: (code, lang) => {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext'
+                return hljs.highlight(code, { language }).value
+            }
+        })
+    )
 
-	const marked = new Marked(
-		markedHighlight({
-			langPrefix: 'hljs language-',
-			highlight: (code, lang) => {
-				const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-				return hljs.highlight(code, { language }).value;
-			}
-		})
-	);
+    interface PageData {
+        fileNames?: string[]
+    }
 
-	interface PageData {
-		fileNames?: string[];
-	}
+    let { data } = $props<{ data: PageData }>()
 
-	let { data } = $props<{ data: PageData }>();
+    let systemPrompt = $state('')
+    let examplePrompt = $state('')
+    let deepSeek = $state(false)
+    let fileNames = $state([] as string[])
 
-	let systemPrompt = $state('');
-	let examplePrompt = $state('');
-	let deepSeek = $state(false);
-	let fileNames = $state([] as string[]);
+    let chatHistory = $state(
+        typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('chatHistory') || '[]') : []
+    )
 
-	let chatHistory = $state(
-		typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('chatHistory') || '[]') : []
-	);
-	$effect(() => {
-		if (data?.fileNames) {
-			fileNames = [...data.fileNames];
-			console.log("File names loaded from page data:", fileNames);
-		}
-	});
+    $effect(() => {
+        if (data?.fileNames) {
+            fileNames = [...data.fileNames]
+        }
+    })
 
-	$effect(() => {
-		if (typeof window !== 'undefined') {
-			localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-		}
-	});
+    $effect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('chatHistory', JSON.stringify(chatHistory))
+        }
+    })
 
-	const response = readableStreamStore();
-	let responseText = $state('');
+    const response = readableStreamStore()
 
-	function stripThinkTags(text: string): string {
-		const thinkRegex = /<think>[\s\S]*?<\/think>/g;
-		return text.replace(thinkRegex, '');
-	}
+    let responseText = $state('')
 
-	$effect(() => {
-		if (response.text !== '') {
-			(async () => {
-				const parsedText = await marked.parse(response.text);
-				responseText = DOMPurify.sanitize(parsedText)
-					.replace(/<script>/g, '&lt;script&gt;')
-					.replace(/<\/script>/g, '&lt;/script&gt;');
-			})();
-		}
-	});
+    // Add this helper function
+    function stripThinkTags(text: string): string {
+        const thinkRegex = /<think>[\s\S]*?<\/think>/g
+        return text.replace(thinkRegex, '')
+    }
 
-	async function handleSubmit(this: HTMLFormElement, event: Event) {
-		event?.preventDefault();
-		if (response.loading) return;
+    $effect(() => {
+        if (response.text !== '') {
+            ;(async () => {
+                // Strip <think> tags from the response text
+                //const cleanedText = stripThinkTags(response.text);
+                const parsedText = await marked.parse(response.text)
+                responseText = DOMPurify.sanitize(parsedText)
+                    .replace(/<script>/g, '&lt;script&gt;')
+                    .replace(/<\/script>/g, '&lt;/script&gt;')
+            })()
+        }
+    })
 
-		const formData: FormData = new FormData(this);
-		const message = formData.get('message');
+    async function handleSubmit(this: HTMLFormElement, event: Event) {
+    event?.preventDefault()
+    if (response.loading) return // prevent request while waiting for response
 
-		if (!message) return;
+    const formData: FormData = new FormData(this)
+    const message = formData.get('message')
 
-		chatHistory = [...chatHistory, { role: 'user', content: message as string }];
+    if (!message) {
+        return
+    }
 
-		try {
-			const answer = response.request(
-				new Request('/api/chat', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ chats: chatHistory, systemPrompt, deepSeek, fileNames })
-				})
-			);
+    chatHistory = [...chatHistory, { role: 'user', content: message as string }]
 
-			this.reset();
-			const answerText = (await answer) as string;
-			const parsedAnswer = await marked.parse(answerText);
-			const purifiedText = DOMPurify.sanitize(parsedAnswer)
-				.replace(/<script>/g, '&lt;script&gt;')
-				.replace(/<\/script>/g, '&lt;/script&gt;');
+    try {
+        console.log({
+            chats: chatHistory,
+            systemPrompt,
+            deepSeek,
+            fileNames
+        })
+//yoyo getting on error on following line
+        const answer = response.request(
+            new Request('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chats: [...chatHistory],
+                    systemPrompt: `${systemPrompt}`,
+                    deepSeek: !!deepSeek,
+                    fileNames: [...fileNames]
+                })
+            })
+        )
 
-			chatHistory = [...chatHistory, { role: 'assistant', content: purifiedText }];
-			console.log(answerText);
-		} catch (error) {
-			console.error(error);
-		}
-	}
+        this.reset() // clear the form
 
-	function deleteAllChats() {
-		console.log('Deleting all chats');
-		chatHistory = [];
-	}
+        const answerText = (await answer) as string
 
-	function deleteFileName(fileName: string) {
-		fileNames = fileNames.filter((name) => name !== fileName);
-	}
+        const parsedAnswer = await marked.parse(answerText)
+        const purifiedText = DOMPurify.sanitize(parsedAnswer)
+            .replace(/<script>/g, '&lt;script&gt;')
+            .replace(/<\/script>/g, '&lt;/script&gt;')
+
+        chatHistory = [...chatHistory, { role: 'assistant', content: purifiedText }]
+
+        console.log(answerText)
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+    function deleteAllChats() {
+        chatHistory = []
+    }
+
+    function deleteFileName(fileName: string) {
+        // Update the local state instead of the prop
+        fileNames = fileNames.filter((name) => name !== fileName)
+    }
 </script>
 
-<!-- TOP AI-THEMED NAVIGATION BAR -->
+<!-- TOP AI NAVIGATION BAR -->
 <header class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-md border-b border-gray-200">
 	<div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-		<!-- Brand -->
 		<div class="flex items-center space-x-3">
 			<BotIcon class="h-8 w-8 text-indigo-600" />
-			<span class="text-xl font-bold text-gray-800 tracking-tight">AI ChatBot</span>
+			<span class="text-xl font-bold text-gray-800 tracking-tight">AI Image Lab</span>
 		</div>
-		<!-- Nav Links -->
 		<nav class="flex space-x-6 text-gray-600 font-medium">
 			<a href="/" class="hover:text-indigo-600 transition flex items-center space-x-1">
 				<Home class="w-5 h-5" />
@@ -149,123 +169,99 @@
 	</div>
 </header>
 
-<!-- MAIN CHAT CONTENT -->
-<main class="flex min-h-screen w-screen flex-col items-center bg-pink-100">
-	<ChatAppBar bind:selectedSystemPrompt={systemPrompt} bind:selectedExamplePrompt={examplePrompt} bind:deepSeek />
+<main class="flex min-h-screen w-screen flex-col items-center bg-primary-50-950">
+    <!-- The app bar for this page -->
+    <ChatAppBar
+        bind:selectedSystemPrompt={systemPrompt}
+        bind:selectedExamplePrompt={examplePrompt}
+        bind:deepSeek />
 
-	<div class="flex w-full">
-		<FileUploadAside />
-		<form onsubmit={handleSubmit} class="m-4 flex flex-col rounded-xxl border-2 border-black p-2">
-			<div class="space-y-4">
-				<div class="flex space-x-2">
-					<Avatar name="Teacher image" src="/gabbe-avatar2.webp" />
-					<div class="assistant-chat">Hello! How can I help you?</div>
-				</div>
+    <div class="flex w-full">
+        <FileUploadAside />
+        <form
+            onsubmit={handleSubmit}
+            class="m-4 flex flex-col rounded-md border-2 border-primary-500 p-2">
+            <div class="space-y-4">
+                <div class="flex space-x-2">
+                    <Avatar src="/gabbe-avatar2.webp" name="Tutor girl image" />
+                    <div class="rounded-lg bg-primary-100 p-2">Hello! How can I help you?</div>
+                </div>
+                <!-- Need to display each chat item here -->
+                {#each chatHistory as chat, i}
+                    {#if chat.role === 'user'}
+                        <div class="ml-auto flex justify-end">
+                            <div>
+                                <Avatar src="/jammin.png" name="User image" />
+                            </div>
+                            <div class="rounded-lg bg-surface-200 p-2">
+                                {chat.content}
+                            </div>
+                        </div>
+                        <!-- this else handles the assistant role chat display -->
+                    {:else}
+                        <div class="mr-auto flex">
+                            <div>
+                                <Avatar src="/gabbe-avatar2.webp" name="Tutor girl image" />
+                            </div>
+                            <div class="rounded-lg bg-primary-100 p-2">
+                                {@html chat.content}
+                            </div>
+                        </div>
+                    {/if}
+                {/each}
 
-				{#each chatHistory as chat, i}
-					{#if chat.role === 'user'}
-						<div class="mr-auto flex justify-end">
-							<Avatar name="Teacher image" src="/dodger-avatar2.webp" />
-							<div class="user-chat">{chat.content}</div>
-						</div>
-					{:else}
-						<div class="mr-auto flex">
-							<Avatar name="Teacher image" src="/gabbe-avatar2.webp" />
-							<div class="assistant-chat">{@html chat.content}</div>
-						</div>
-					{/if}
-				{/each}
-
-				{#if response.loading}
-					{#await new Promise((res) => setTimeout(res, 400)) then _}
-						<div class="flex space-x-2">
-							<Avatar name="gabbe avatar image" src="/gabbe-avatar2.webp" />
-							<div class="assistant-chat">
-								{#if response.text === ''}
-									<TypingIndicator />
-								{:else}
-									{@html responseText}
-								{/if}
-							</div>
-						</div>
-					{/await}
-				{/if}
-
-				<hr />
-				<div class="flex space-x-4">
-					<textarea
-						class="textarea p-5"
-						required
-						placeholder="Type your message..."
-						name="message"
-						rows="3"
-						bind:value={examplePrompt}
-					></textarea>
-					<div class="flex flex-col justify-between">
-						<button type="submit" class="bg-cyan-600 text-white p-2 rounded-lg border-gray-800 border-2">
-							Send
-						</button>
-						<button
-							type="button"
-							class="bg-red-600 text-white rounded-lg border-gray-800 border-2 mt-2"
-							onclick={deleteAllChats}
-						>
-							Clear Chats
-						</button>
-					</div>
-				</div>
-			</div>
-
-			<div class="flex w-full flex-col items-center">
-				<p class="text-center text-sm text-surface-500 m-4">
-					⬅️ You Can Upload Content by Selecting Files.
-				</p>
-
-				{#if fileNames.length > 0}
-					<div class="flex items-center gap-4">
-						{#each fileNames as fileName}
-							<div class="flex items-center gap-2">
-								<button type="button" class="btn preset-filled-primary-500">
-									<span>{fileName}</span>
-									<CircleX onclick={() => deleteFileName(fileName)} />
-								</button>
-							</div>
-						{/each}
-					</div>
-				{/if}
-			</div>
-		</form>
-	</div>
+                {#if response.loading}
+                    {#await new Promise((res) => setTimeout(res, 400)) then _}
+                        <div class="flex">
+                            <div class="flex space-x-2">
+                                <Avatar name="tutor girl image" src={'/gabbe-avatar2.webp'} />
+                                <div class="rounded-lg bg-primary-100 p-2">
+                                    {#if response.text === ''}
+                                        <TypingIndicator />
+                                    {:else}
+                                        {@html responseText}
+                                    {/if}
+                                </div>
+                            </div>
+                        </div>
+                    {/await}
+                {/if}
+                <div class="space-y-4">
+                    <hr/>
+                    <div class="flex space-x-4">
+                        <textarea
+                            class="textarea"
+                            required
+                            placeholder="Type your message..."
+                            name="message"
+                            rows="3"
+                            bind:value={examplePrompt}></textarea>
+                        <div class="flex flex-col justify-between">
+                            <button type="submit" class="btn preset-filled-primary-500">Send</button>
+                            <button type="button" class="btn preset-filled-secondary-500" onclick={deleteAllChats}
+                                >Clear Chats</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex w-full flex-col items-center">
+                <p class="text-center text-sm text-surface-500">
+                    You can also upload a file for additional context to chat with me. I will do my best to
+                    help you.
+                </p>
+                {#if fileNames.length > 0}
+                    <div class="flex flex-wrap items-center gap-4">
+                        {#each fileNames as fileName}
+                            <div class="flex items-center gap-2">
+                                <button type="button" class="btn preset-filled-primary-500">
+                                    <span>{fileName}</span>
+                                    <CircleX onclick={() => deleteFileName(fileName)} />
+                                </button>
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+            </div>
+        </form>
+    </div>
 </main>
-
-<style lang="postcss">
-	.assistant-chat {
-		@apply rounded-lg bg-primary-100 p-2;
-	}
-	.user-chat {
-		@apply rounded-lg bg-surface-200 p-2;
-	}
-	.assistant-chat :global {
-		ol {
-			@apply ml-4 list-inside list-decimal;
-		}
-		ul {
-			@apply ml-4 list-inside list-disc;
-		}
-		h1 {
-			@apply mb-4 text-2xl font-bold;
-		}
-		h2 {
-			@apply mb-3 text-xl font-bold;
-		}
-		h3 {
-			@apply mb-2 text-lg font-bold;
-		}
-		a {
-			@apply text-primary-500 hover:underline;
-		}
-		blockquote {
-			@apply border-l-4 border-surface-500 pl-4 italic;
-		}
-	}
-</style>

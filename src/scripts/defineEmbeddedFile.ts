@@ -22,7 +22,7 @@ const embeddedFileSchema = {
         apiEndpoint: 'http://host.docker.internal:11434'
     }),
     generative: weaviate.configure.generative.ollama({
-        model: 'llama3.2',
+        model: 'llama3',
         apiEndpoint: 'http://host.docker.internal:11434'
     }),
     properties: [
@@ -83,10 +83,11 @@ async function run() {
 
     client = await connectToWeaviate()
     await addCollection()
-    //await client.collections.delete('Chunks')
+    // await client.collections.delete('Chunks')
     await getCollectionCount('Chunks')
     // npm run localDockerRestart
-    //npm run defineEmbeddedFile
+    //npm run defineEmbeddedFile "DELETE"
+    //npm run defineEmbeddedFile "add and get"
 
    
 
