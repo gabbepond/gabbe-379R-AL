@@ -66,17 +66,25 @@ export async function load() {
     if (fileChunkCollection) {
         const uniqueFileNames = new Set<string>()
         let count = 0
-
         for await (const fileChunk of fileChunkCollection.iterator()) {
+            console.log('GOOOOFile chunk: ', fileChunk)
             count++
             uniqueFileNames.add(fileChunk.properties.file_name)
+            console.log('Unique file names: ', uniqueFileNames)
         }
-
+        console.log('Unique file names: ', uniqueFileNames)
         return {
             status: 200,
             count,
             fileNames: Array.from(uniqueFileNames) // Convert the Set to an array
         }
+        // return {
+        //     success: 'File uploaded successfully.',
+        //     data: {
+        //         fileName: Array.from(uniqueFileNames)
+        //     }
+        // };
+        
     } else {
         return {
             status: 404,
@@ -88,9 +96,9 @@ export async function load() {
 export const actions = {
     uploadFile: async ( {request} ) => {
         const formData = await request.formData();
-        console.log(formData);
+        // console.log(formData);
         const uploadedFile = formData?.get('file') as unknown as File | undefined
-
+        console.log('Uploaded file: ', uploadedFile)
         if (!uploadedFile) {
             console.log('No file uploaded')
             return {
@@ -110,27 +118,31 @@ export const actions = {
 
             // Delete all existing files in the uploads directory
             const files = await fsPromises.readdir(uploadPath)
+            console.log('Files in upload path: ', files)
             for (const file of files ) {
+                console.log('loop files: ', file)
                 await fsPromises.unlink(path.join(uploadPath, file))
             }
+        
 
             //const timeStampSuffix = Date.now();
             //const fileNameOnly = uploadedFile.name.replace('.pdf', '');
             const uploadedFilePath = path.join(uploadPath, uploadedFile.name);
+            // console.log('Uploaded file path: ', uploadedFilePath)
 
             await pipeline(readableStream, fs.createWriteStream(uploadedFilePath));
 
             console.log('File uploaded')
 
             const addedFileData = await createFileDataObject(uploadedFilePath)
-
+            console.log('File data added: ', addedFileData)
             return {
                 status: 200,
                 success: 'File uploaded and processed successfully.',
                 data: addedFileData
             };
         }
-        catch (e) {
+        catch (e) { 
             return {
                 status: 500,
                 body: {
@@ -153,15 +165,16 @@ async function createFileDataObject(uploadedFilePath: string) {
 
     const docs = await loader.load()
     const chunks = []
+    // console.log('Docs: ', docs)
 
     for (const doc of docs) {
         const pageContent = doc.pageContent
-
+        // console.log('Page content: ', pageContent)
         // Calculate chunks with overlapping content
         let startPos = 0
         while (startPos < pageContent.length) {
             const chunk = pageContent.slice(startPos, startPos + (OPTIMAL_CHUNK_SIZE * CHARS_PER_TOKEN))
-
+            console.log('Chunk: ', chunk)
             chunks.push({
                 chunk_text: chunk,
                 file_name: path.basename(uploadedFilePath),
@@ -170,13 +183,14 @@ async function createFileDataObject(uploadedFilePath: string) {
                     pageNumberLocation: doc.metadata?.loc?.pageNumber,
                     chunkIndex: chunks.length,
                 }
+                
             })
 
             startPos += ((OPTIMAL_CHUNK_SIZE - CHUNK_OVERLAP) * CHARS_PER_TOKEN)
         }
-        //console.log('Chunks: ', chunks)
+        console.log('Chunks: ', chunks)
     }
-
+   
     await importFileChunks(chunks)
     
     return { success: true }
@@ -189,7 +203,7 @@ async function importFileChunks(chunks: any[]) {
     // Create a log file with timestamp
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
     const logPath = path.join(uploadPath, `chunks-log-${timestamp}.json`)
-
+    console.log('gooochunks: ', chunks)
     // Write initial chunks data
     await fsPromises.writeFile(
         logPath,
@@ -220,11 +234,13 @@ async function importFileChunks(chunks: any[]) {
         batches.push(chunks.slice(i, i + BATCH_SIZE))
     }
 
-    console.log(`Inserting ${batches.length} batches of ${BATCH_SIZE} chunks each`)
 
+    console.log(`Inserting ${batches.length} batches of ${BATCH_SIZE} chunks each`)
+// FINAL inserting into database successfully but when i check the temrinal it has nothing in Chunks.
     let totalInserted = 0
     for (const [index, batch] of batches.entries()) {
         try {
+            console.log(`Batch: `, batch)
             await fileChunkCollection.data.insertMany(batch)
             totalInserted += batch.length
             console.log(

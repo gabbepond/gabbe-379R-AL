@@ -11,7 +11,7 @@
 
 <div class="flex flex-col items-center justify-start m-8">
     <form class="flex flex-col gap-4" method="POST" action="/chat?/uploadFile" enctype="multipart/form-data" onsubmit={handleSubmit}>
-        <h2>Choose the data file (in PDF format) you would like to upload</h2>
+        <h2>Choose The Data File (in PDF format) You Would Like To Upload</h2>
         <label class="label">
             <span class="label-text">Select a file</span>
             <input class="input" type="file" accept=".pdf" name="file" />

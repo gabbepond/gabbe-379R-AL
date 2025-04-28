@@ -9,7 +9,7 @@ export function readableStreamStore() {
         try {
             const result = await fetch(request);
 
-            console.log('GOOResult:', result.body);
+            // console.log('GOOResult:', result.body);
             if (!result.ok) throw new Error(result.statusText);
             if (!result.body) return;
 
@@ -33,7 +33,7 @@ export function readableStreamStore() {
             
             return finaltext;
         } catch (err: unknown) {
-            console.log('GOOcatch:');
+            // console.log('GOOcatch:');
             loading = false;
             text = err.toString();
             throw err;

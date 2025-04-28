@@ -3,7 +3,7 @@
 
     let { data }: { data: PageData } = $props()
 
-    console.log(data)
+    // console.log(data)
 
 </script>
 
