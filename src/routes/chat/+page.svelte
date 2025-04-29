@@ -38,7 +38,7 @@
     let { data } = $props<{ data: PageData }>()
 	console.log('data in +page.svelte', data)
     //console.log('data', data)
-    let systemPrompt = $state('')
+    let systemPrompt = $state('Helpful Assistant')
     let examplePrompt = $state('')
     let deepSeek = $state(false)
     let fileNames = $state([] as string[])

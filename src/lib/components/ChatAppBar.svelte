@@ -25,14 +25,14 @@ let systemPrompts = [
         deepSeek?: boolean;
     }>();
 
-/* 
+
     function handleSystemPromptChange(event: Event & { currentTarget: EventTarget & HTMLSelectElement }) {
         selectedSystemPrompt = (event.currentTarget as HTMLSelectElement).value;
     }
 
     function handleExamplePromptChange(event: Event & { currentTarget: EventTarget & HTMLSelectElement }) {
         selectedExamplePrompt = event.currentTarget.value;
-    } */
+    } 
   //  Gabbe
   </script>
   
